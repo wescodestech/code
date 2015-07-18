@@ -8,6 +8,8 @@
 
 // Card Game includes
 #include "Blackjack.h"
+#include "Chips.h"
+#include "Players.h"
 
 // STL Includes
 #include <iostream>
@@ -37,7 +39,7 @@ namespace CardGames
         // TODO: This is for 6-deck blackjack. Modify to be configurable up to 6.
         for( unsigned int c = 0; c <= 6; ++c )
         {
-            for( unsigned int card = Card::Cards::SPADES_ACE; card < Card::Cards::JOKER1; ++card )
+            for( unsigned int card = Card::SPADES_ACE; card < Card::JOKER1; ++card )
             {
                 m_deck.push_back( static_cast<Card::Cards>( card ) );
             }
@@ -248,7 +250,7 @@ namespace CardGames
     Blackjack::Outcome
     Blackjack::EvaluateWinner()
     {
-        Blackjack::Outcome result = Outcome::OUTCOME_PUSH;
+        Blackjack::Outcome result = Blackjack::OUTCOME_PUSH;
         vector<Card::Cards> player = m_player.getHand();
         vector<Card::Cards> dealer = m_dealer.getHand();
 
@@ -257,33 +259,33 @@ namespace CardGames
           )
         {
             // Loss
-            result = Outcome::OUTCOME_LOSS;
+            result = Blackjack::OUTCOME_LOSS;
         }
         else if ( GetCardTotal( dealer ) == 21 && dealer.size() == 2 ) // Dealer Blackjack
         {
             if( GetCardTotal( player ) > 21 && player.size() == 2 )
             {
-                result = Outcome::OUTCOME_PUSH;
+                result = Blackjack::OUTCOME_PUSH;
             }
             else
             {
-                result = Outcome::OUTCOME_LOSS;
+                result = Blackjack::OUTCOME_LOSS;
             }
         }
         else if( GetCardTotal( dealer ) == GetCardTotal( player ) )
         {
             // Push
-            result = Outcome::OUTCOME_PUSH;
+            result = Blackjack::OUTCOME_PUSH;
         }
         else if( GetCardTotal( dealer ) > 21 )
         {
             // Dealer bust, Winner
-            result = Outcome::OUTCOME_WINNER;
+            result = Blackjack::OUTCOME_WINNER;
         }
         else
         {
             // Winner
-            result = Outcome::OUTCOME_WINNER;
+            result = Blackjack::OUTCOME_WINNER;
         }
 
         return result;

@@ -21,8 +21,8 @@ using namespace std;
 namespace CardGames
 {
     Blackjack::Blackjack()
-        : m_dealer(Players())
-        , m_player(Players())
+        : m_dealer( Players() )
+        , m_player( Players() )
         , m_deck()
     {
     }
@@ -293,16 +293,29 @@ namespace CardGames
 
     void Blackjack::PlayBlackjack()
     {
-        // Create players
-
         // Shuffle Cards
+        CreateCardDeck();
+        vector<Card::Cards>::iterator it = m_deck.begin();
 
-        // place bets
+        // Give the player some money to start
+        Chips chips = m_player.getChips();
+        chips.Credit( 500 );
 
-        // Deal Cards
+        bool continueGame = true;
+        while( continueGame )
+        {
+            // Ask a player to place a bet
 
-        // Play Hand
+            // Deal cards to dealer and player
 
-        // Cleanup
+            // Ask player to perform an action
+
+            // See any moves are availible based on action
+            // repeat until complete
+
+            // Turn dealer cards
+
+            // Evaluate winner
+        }
     }
 }

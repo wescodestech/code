@@ -20,23 +20,25 @@ Imlib_Image img;
 
 // Define some X functions
 bool InitX( int a_width, int a_height );
+bool InitXSubImage( const char* a_filename, int a_width, int a_height );
 bool InitImlib( const char* a_filename, int& a_width, int& a_height );
 void CloseX();
-void EventLoop();
-void Redraw();
+void EventLoop( const char* a_filename, int a_width, int a_height );
+void Redraw( int a_width, int a_height );
 
 int main(int argc, char **argv)
 {
     int width;
     int height;
     const char* filename = NULL;
-
-    if (argc < 2)
+    const char* filename2 = NULL;
+    if (argc < 3 )
     {
         fprintf(stderr, "usage: %s <image_file>\n", argv[0]);
         return 1;
     }
     filename = argv[1];
+    filename2 = argv[2];
 
     if( !InitImlib( filename, width, height ) )
     {
@@ -49,7 +51,7 @@ int main(int argc, char **argv)
         fprintf( stderr, "Could not init X.\n" );
     }
 
-    EventLoop();
+    EventLoop( filename2, width, height );
 
     return 0;
 }
@@ -89,6 +91,22 @@ bool InitX( int a_width, int a_height )
     return true;
 }
 
+bool InitXSubImage( const char* a_filename, int a_width, int a_height )
+{
+    Imlib_Image subImg = imlib_load_image( a_filename );
+    imlib_context_set_image( subImg );
+    imlib_render_image_on_drawable( a_width, a_height );
+    XSetWindowBackgroundPixmap( dpy, root, pix );
+    XClearWindow( dpy, root );
+
+    while( XPending( dpy ) )
+    {
+        XEvent ev;
+        XNextEvent( dpy, &ev );
+    }
+    return true;
+}
+
 bool InitImlib( const char* a_filename, int& a_width, int& a_height )
 {
     img = imlib_load_image( a_filename );
@@ -102,7 +120,7 @@ bool InitImlib( const char* a_filename, int& a_width, int& a_height )
     return true;
 }
 
-void EventLoop()
+void EventLoop( const char* a_filename, int a_width, int a_height )
 {
     XEvent event;
     char text[255];
@@ -116,8 +134,8 @@ void EventLoop()
         if( event.type==Expose && event.xexpose.count==0 )
         {
             // The window was exposed redraw it!
-            Redraw();
-        }
+            XClearWindow( dpy, root );
+	}
         if( event.type==KeyPress &&
             XLookupString(&event.xkey,text,255,&key,0)==1 )
         {
@@ -126,6 +144,10 @@ void EventLoop()
             if (text[0]=='q')
             {
                 CloseX();
+            }
+            else if( text[0] == 'c' )
+            {
+                Redraw( a_width, a_height );
             }
             else
             {
@@ -137,10 +159,10 @@ void EventLoop()
             // Tell where the mouse Button was Pressed
             int x=event.xbutton.x;
             int y=event.xbutton.y;
-
-            strcpy(text,"X is FUN!");
-            XSetForeground( dpy, gc, rand()%event.xbutton.x%255 );
-            XDrawString( dpy, root, gc, x, y, text, strlen(text) );
+	    InitXSubImage( a_filename, x, y );
+            //strcpy(text,"X is FUN!");
+            //XSetForeground( dpy, gc, rand()%event.xbutton.x%255 );
+            //XDrawString( dpy, root, gc, x, y, text, strlen(text) );
         }
     }
 }
@@ -153,7 +175,23 @@ void CloseX()
     exit( 1 );
 }
 
-void Redraw()
+void Redraw( int a_width, int a_height )
 {
+    pix = XCreatePixmap( dpy, root, a_width, a_height, DefaultDepthOfScreen(scn) );
+
+    XSelectInput( dpy, root, ExposureMask|ButtonPressMask|KeyPressMask );
+    gc = XCreateGC( dpy, root, 0, 0 );
     XClearWindow( dpy, root );
+    XMapRaised( dpy, root );
+
+
+    imlib_render_image_on_drawable( 0, 0 );
+    XSetWindowBackgroundPixmap( dpy, root, pix );
+    XClearWindow( dpy, root );
+
+    while( XPending( dpy ) )
+    {
+        XEvent ev;
+        XNextEvent( dpy, &ev );
+    }
 }

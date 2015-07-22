@@ -232,13 +232,16 @@ namespace CardGames
     void
     Blackjack::PlaceBet( const unsigned int a_amount )
     {
-        m_player.getChips().Credit( a_amount );
+        m_player.getChips().Debit( a_amount );
     }
 
     void
     Blackjack::MakePlayerMove()
     {
-
+	// Hit
+	// Stay
+	// Double Down
+	// Split (if two of the same cards)
     }
 
     void

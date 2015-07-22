@@ -1,0 +1,3 @@
+[submodule "imlib2"]
+	path = imlib2
+	url = http://git.enlightenment.org/legacy/imlib2.git

@@ -336,7 +336,12 @@ namespace CardGames
                 }
             } break;
             case DOUBLE_DOWN:
-                break;
+            {
+                vector<Card::Cards>::iterator card = m_deck.begin();
+                m_player.addToHand( *card );
+                m_deck.erase( card );
+                complete = true;
+            }break;
             case SPLIT:
                 break;
             default:
@@ -349,7 +354,12 @@ namespace CardGames
     void
     Blackjack::TurnDealerCards()
     {
-
+        while( GetCardTotal( m_dealer.getHand() ) < 17 )
+        {
+            vector<Card::Cards>::iterator card = m_deck.begin();
+            m_dealer.addToHand( *card );
+            m_deck.erase( card );
+        }
     }
 
     Blackjack::Outcome
@@ -359,14 +369,12 @@ namespace CardGames
         vector<Card::Cards> player = m_player.getHand();
         vector<Card::Cards> dealer = m_dealer.getHand();
 
-        if( GetCardTotal( player ) > 21 || // Player bust
-            GetCardTotal( dealer ) > GetCardTotal( player ) // Dealer hand wins
-          )
+        if( GetCardTotal( player ) > 21 ) // Player bust
         {
             // Loss
             result = Blackjack::OUTCOME_LOSS;
         }
-        else if ( GetCardTotal( dealer ) == 21 && dealer.size() == 2 ) // Dealer Blackjack
+        else if( GetCardTotal( dealer ) == 21 && dealer.size() == 2 ) // Dealer Blackjack
         {
             if( GetCardTotal( player ) > 21 && player.size() == 2 )
             {
@@ -387,6 +395,11 @@ namespace CardGames
             // Dealer bust, Winner
             result = Blackjack::OUTCOME_WINNER;
         }
+        else if( GetCardTotal( dealer) > GetCardTotal( player ) )
+        {
+            // Dealer beats player
+            result = Blackjack::OUTCOME_LOSS;
+        }
         else
         {
             // Winner
@@ -396,6 +409,7 @@ namespace CardGames
         return result;
     }
 
+    // Driver for a CLI
     void Blackjack::PlayBlackjack()
     {
         // Shuffle Cards
@@ -417,7 +431,6 @@ namespace CardGames
 
             // Verify that the player has enough money
             bool enoughMoney = chips.Debit( input );
-
             if( enoughMoney )
             {
                 // Deal the damn cards :)
@@ -431,27 +444,30 @@ namespace CardGames
                 Card::Cards two = m_player.getHand().at( 1 );
                 cout << "Your Cards: " << Card::toString( one ) << "  " << Card::toString( two ) << endl;
 
-                // TODO: Verify dealer doesn't have a blackjack
-
-                // Ask player for action
-                int moveInput = 0;
-                cout << "Make a Move:\n 0: STAY\n 1: HIT\n 2: DOUBLE DOWN\n 3: SPLIT" << endl;
-                cin >> moveInput;
-                while( !MakePlayerMove( static_cast<Blackjack::Move>(moveInput) ) )
+                // Play game if dealer doesn't have a blackjack.
+                if( GetCardTotal( m_dealer.getHand() ) != 21 )
                 {
-                    // Print the players hand
-                    cout << "-----------------------------------" << endl;
-                    for( int i = 0; i < m_player.getHand().size(); ++i )
-                    {
-                        Card::Cards current = m_player.getHand().at( i );
-                        cout << Card::toString( current ) << endl;
-                    }
-                    cout << GetCardTotal( m_player.getHand() ) << endl;
+
+                    // Ask player for action
+                    int moveInput = 0;
                     cout << "Make a Move:\n 0: STAY\n 1: HIT\n 2: DOUBLE DOWN\n 3: SPLIT" << endl;
                     cin >> moveInput;
-                }
+                    while( !MakePlayerMove( static_cast<Blackjack::Move>(moveInput) ) )
+                    {
+                        // Print the players hand
+                        cout << "-----------------------------------" << endl;
+                        for( int i = 0; i < m_player.getHand().size(); ++i )
+                        {
+                            Card::Cards current = m_player.getHand().at( i );
+                            cout << Card::toString( current ) << endl;
+                        }
+                        cout << GetCardTotal( m_player.getHand() ) << endl;
+                        cout << "Make a Move:\n 0: STAY\n 1: HIT\n 2: DOUBLE DOWN\n 3: SPLIT" << endl;
+                        cin >> moveInput;
+                    }
 
-                // TODO: Play out the dealers hand...
+                    TurnDealerCards();
+                }
 
                 // Print the Final players hand
                 cout << "------------PLAYER-------------" << endl;

@@ -11,6 +11,8 @@ class Card{
 
 public:
 
+    // TODO: Reword Card to enum the value + suit and store that as a tuple in this class.
+
 	//Enum Values
 	/**Enumerated Data Type Cards
 	Each card in a standard deck, including jokers

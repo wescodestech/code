@@ -25,6 +25,14 @@ class  Blackjack
         , OUTCOME_LOSS
         , OUTCOME_PUSH
     };
+
+    enum Move
+    {
+        STAY
+        , HIT
+        , DOUBLE_DOWN
+        , SPLIT
+    };
 // For this game we will need
 // Choosed number of Decks of cards (x6)
 // A player
@@ -52,17 +60,18 @@ public:
     ~Blackjack();
 
     void CreateCardDeck();
+    void ClearCardDeck();
     void ShuffleCardDeck();
 
     unsigned int
     GetCardTotal( const vector<Card::Cards>& a_hand );
 
-    void DealCards();
+    bool DealCards();
     void CleanupDealtCards();
 
     void PlaceBet( const unsigned int a_amount );
 
-    void MakePlayerMove();
+    bool MakePlayerMove( Move a_action );
 
     void TurnDealerCards();
 

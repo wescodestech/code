@@ -14,8 +14,6 @@
 // STL Includes
 #include <iostream>
 #include <algorithm>
-#include <random>
-#include <chrono>
 #include <ctime>
 #include <vector>
 using namespace std;
@@ -23,9 +21,7 @@ using namespace std;
 namespace CardGames
 {
     Blackjack::Blackjack()
-        : m_dealer( Players() )
-        , m_player( Players() )
-        , m_deck()
+    : m_deck()
     {
     }
 
@@ -59,15 +55,22 @@ namespace CardGames
         m_deck.clear();
     }
 
+    // Random number generator for use in ShuffleCardDeck
+    int RNG (int n)
+    {
+        return std::rand() / (1.0 + RAND_MAX) * n;
+    }
+
     void
     Blackjack::ShuffleCardDeck()
     {
         // Shuffle the deck of cards if it's been populated.
         if( m_deck.size() > 0 )
         {
-            unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-            shuffle( m_deck.begin(), m_deck.end(), std::default_random_engine( seed ) );
 
+
+            srand( unsigned( time(NULL) ) );
+            random_shuffle( m_deck.begin(), m_deck.end(), RNG );
             // Burn card
             m_deck.erase( m_deck.begin() );
         }
@@ -255,7 +258,7 @@ namespace CardGames
         {
             total = faceCardTotal + numberOfAces;
         }
-        else if( numberOfAces > 1 )
+        else if( numberOfAces > 0 )
         {
             total = faceCardTotal + aces11;
         }

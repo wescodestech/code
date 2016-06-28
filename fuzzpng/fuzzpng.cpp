@@ -198,12 +198,12 @@ void process_file( void )
 
 int main( int argc, char **argv )
 {
-    if ( argc != 3 )
+    if ( argc != 2 )
             abort_( "Usage: program_name <file_in> <file_out>" );
     
     ReadPngFile( argv[1] );
     process_file();
-    WritePngFile( argv[2] );
+    // WritePngFile( argv[2] );
     
     return 0;
 }

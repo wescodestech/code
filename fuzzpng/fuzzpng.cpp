@@ -32,7 +32,7 @@ png_bytep * rowPointers;
 
 void ReadPngFile( char* filename )
 {
-        char header[8];
+        unsigned char header[8];
 
         // open file and test for it being a png
         FILE *fp = fopen( filename, "rb" );
@@ -167,16 +167,16 @@ void WritePngFile( char* filename )
 
 void process_file( void )
 {
-    if( png_get_color_type( pngPtr, infoPtr ) == PNG_colorType_RGB )
+    if( png_get_color_type( pngPtr, infoPtr ) == PNG_COLOR_TYPE_RGB )
     {
         abort_( "[process_file] input file is PNG_colorType_RGB but must be PNG_colorType_RGBA "
             "( lacks the alpha channel )" );
     }
     
-    if( png_get_color_type( pngPtr, infoPtr ) != PNG_colorType_RGBA )
+    if( png_get_color_type( pngPtr, infoPtr ) != PNG_COLOR_TYPE_RGBA )
     {
         abort_( "[process_file] colorType of input file must be PNG_colorType_RGBA (%d) (is %d)",
-            PNG_color_type_RGBA, png_get_color_type( pngPtr, infoPtr ) );
+            PNG_COLOR_TYPE_RGBA, png_get_color_type( pngPtr, infoPtr ) );
     }
     
     for( y = 0; y < height; ++y ) 
